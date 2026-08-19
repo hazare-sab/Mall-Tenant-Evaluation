@@ -1,0 +1,11 @@
+{
+  "name": "mall-tenant-evaluation-root",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix mall-tenant-management-system run dev",
+    "build": "npm --prefix mall-tenant-management-system run build",
+    "start": "npm --prefix mall-tenant-management-system run start",
+    "lint": "npm --prefix mall-tenant-management-system run lint"
+  }
+}

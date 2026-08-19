@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   Store, Users, CreditCard, AlertTriangle,
-  TrendingUp, Clock, CheckCircle, Building2
+  TrendingUp, Clock, CheckCircle2, Building2
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -41,49 +41,48 @@ export default function DashboardOverview() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin-slow" />
+        <div className="w-8 h-8 border-3 border-slate-700 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  if (!data) return <p>Failed to load dashboard data.</p>;
+  if (!data) return <p className="text-sm text-slate-500">Failed to load dashboard data.</p>;
 
   const cards = [
-    { title: "Total Shops", value: data.totalShops, icon: Store, color: "from-blue-500 to-blue-600", change: "" },
-    { title: "Occupied Shops", value: data.occupiedShops, icon: Building2, color: "from-emerald-500 to-emerald-600", change: `${data.totalShops ? Math.round((data.occupiedShops / data.totalShops) * 100) : 0}% occupancy` },
-    { title: "Vacant Shops", value: data.vacantShops, icon: Store, color: "from-amber-500 to-amber-600", change: "" },
-    { title: "Total Tenants", value: data.totalTenants, icon: Users, color: "from-purple-500 to-purple-600", change: "" },
-    { title: "Pending Approvals", value: data.pendingPayments, icon: Clock, color: "from-orange-500 to-orange-600", change: "" },
-    { title: "Rent Collected", value: `₹${data.rentCollected.toLocaleString()}`, icon: CreditCard, color: "from-green-500 to-green-600", change: "This month" },
-    { title: "Overdue Payments", value: data.overduePayments, icon: AlertTriangle, color: "from-red-500 to-red-600", change: "" },
-    { title: "Lease Expiring", value: data.leaseExpiring, icon: TrendingUp, color: "from-indigo-500 to-indigo-600", change: "Next 90 days" },
+    { title: "Total Shops", value: data.totalShops, icon: Store, note: "Commercial spaces", color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200" },
+    { title: "Occupied Shops", value: data.occupiedShops, icon: Building2, note: `${data.totalShops ? Math.round((data.occupiedShops / data.totalShops) * 100) : 0}% occupancy rate`, color: "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300" },
+    { title: "Vacant Shops", value: data.vacantShops, icon: Store, note: "Ready for lease", color: "bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300" },
+    { title: "Active Tenants", value: data.totalTenants, icon: Users, note: "Registered businesses", color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200" },
+    { title: "Pending Approvals", value: data.pendingPayments, icon: Clock, note: "Requires admin review", color: "bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300" },
+    { title: "Rent Collected", value: `₹${data.rentCollected.toLocaleString()}`, icon: CreditCard, note: "Current billing cycle", color: "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300" },
+    { title: "Overdue Payments", value: data.overduePayments, icon: AlertTriangle, note: "Past due date", color: "bg-red-50 text-red-800 dark:bg-red-950/40 dark:text-red-300" },
+    { title: "Lease Expiry", value: data.leaseExpiring, icon: TrendingUp, note: "Next 90 days", color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200" },
   ];
 
   return (
     <div className="space-y-6">
+      {/* Metric Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card, i) => {
           const Icon = card.icon;
           return (
-            <div
-              key={i}
-              className="rounded-xl p-5 border shadow-sm hover:shadow-md transition"
-              style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                  {card.title}
-                </p>
-                <div className={`w-10 h-10 bg-gradient-to-br ${card.color} rounded-lg flex items-center justify-center`}>
-                  <Icon size={18} className="text-white" />
+            <div key={i} className="warm-card warm-card-hover p-5 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    {card.title}
+                  </span>
+                  <div className={`p-2 rounded-xl ${card.color}`}>
+                    <Icon size={16} />
+                  </div>
                 </div>
+                <p className="text-2xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+                  {card.value}
+                </p>
               </div>
-              <p className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-                {card.value}
-              </p>
-              {card.change && (
-                <p className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
-                  {card.change}
+              {card.note && (
+                <p className="text-[11px] font-medium mt-3 text-slate-500 dark:text-slate-400">
+                  {card.note}
                 </p>
               )}
             </div>
@@ -91,30 +90,41 @@ export default function DashboardOverview() {
         })}
       </div>
 
-      {/* Chart */}
-      <div
-        className="rounded-xl p-6 border shadow-sm"
-        style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}
-      >
-        <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>
-          Monthly Rent Collection
-        </h3>
+      {/* Analytics Chart */}
+      <div className="warm-card p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-base font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+              Monthly Rent Collection Performance
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Historical revenue breakdown over the past 6 billing months
+            </p>
+          </div>
+          <span className="text-xs font-semibold px-3 py-1 rounded-full badge-sage">
+            Updated Today
+          </span>
+        </div>
+
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data.monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="month" stroke="var(--text-secondary)" fontSize={12} />
-              <YAxis stroke="var(--text-secondary)" fontSize={12} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
+            <BarChart data={data.monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+              <XAxis dataKey="month" stroke="var(--text-secondary)" fontSize={11} tickLine={false} axisLine={false} />
+              <YAxis stroke="var(--text-secondary)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
               <Tooltip
+                cursor={{ fill: "rgba(0,0,0,0.03)" }}
                 contentStyle={{
                   backgroundColor: "var(--bg-secondary)",
                   border: "1px solid var(--border)",
-                  borderRadius: "8px",
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+                  fontSize: "12px",
                   color: "var(--text-primary)",
                 }}
-                formatter={(value: unknown) => [`₹${Number(value || 0).toLocaleString()}`, "Collection"]}
+                formatter={(value: unknown) => [`₹${Number(value || 0).toLocaleString()}`, "Rent Revenue"]}
               />
-              <Bar dataKey="amount" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="amount" fill="#1E293B" radius={[6, 6, 0, 0]} maxBarSize={48} />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Send, Loader2, CheckCircle } from "lucide-react";
+import { Send, Loader2, CheckCircle2, Megaphone } from "lucide-react";
 import { api } from "@/lib/api";
 
 interface Tenant {
@@ -61,46 +61,53 @@ export default function NoticesPanel() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div
-        className="rounded-xl p-6 border shadow-sm"
-        style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}
-      >
-        <h3 className="text-lg font-semibold mb-5" style={{ color: "var(--text-primary)" }}>
-          Send Notice to Tenants
-        </h3>
+      <div className="warm-card p-6">
+        <div className="flex items-center gap-3 mb-6 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
+          <div className="p-2.5 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900">
+            <Megaphone size={18} />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>
+              Broadcast Tenant Announcement
+            </h3>
+            <p className="text-xs text-slate-500">
+              Send circulars, maintenance notifications, or payment reminders
+            </p>
+          </div>
+        </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 text-xs">
           <div className="flex gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer font-semibold" style={{ color: "var(--text-primary)" }}>
               <input
                 type="radio"
                 checked={form.sendToAll}
                 onChange={() => setForm({ ...form, sendToAll: true })}
-                className="accent-blue-500"
+                className="accent-slate-900"
               />
-              <span className="text-sm" style={{ color: "var(--text-primary)" }}>All Tenants</span>
+              <span>All Active Tenants</span>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer font-semibold" style={{ color: "var(--text-primary)" }}>
               <input
                 type="radio"
                 checked={!form.sendToAll}
                 onChange={() => setForm({ ...form, sendToAll: false })}
-                className="accent-blue-500"
+                className="accent-slate-900"
               />
-              <span className="text-sm" style={{ color: "var(--text-primary)" }}>Specific Tenant</span>
+              <span>Specific Tenant</span>
             </label>
           </div>
 
           {!form.sendToAll && (
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Select Tenant</label>
+              <label className="block font-semibold mb-1" style={{ color: "var(--text-secondary)" }}>Select Recipient *</label>
               <select
                 value={form.userId}
                 onChange={(e) => setForm({ ...form, userId: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg border text-sm outline-none"
+                className="w-full px-3 py-2 rounded-xl border outline-none cursor-pointer"
                 style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border)", color: "var(--text-primary)" }}
               >
-                <option value="">Choose a tenant...</option>
+                <option value="">Choose a tenant recipient...</option>
                 {tenants.map((t) => (
                   <option key={t.userId} value={t.userId}>{t.userName} - {t.brandName || t.userEmail}</option>
                 ))}
@@ -109,54 +116,54 @@ export default function NoticesPanel() {
           )}
 
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Notice Type</label>
+            <label className="block font-semibold mb-1" style={{ color: "var(--text-secondary)" }}>Notice Type</label>
             <select
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border text-sm outline-none"
+              className="w-full px-3 py-2 rounded-xl border outline-none cursor-pointer"
               style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border)", color: "var(--text-primary)" }}
             >
-              <option value="general">General Notice</option>
-              <option value="rent_due">Rent Reminder</option>
+              <option value="general">General Circular / Update</option>
+              <option value="rent_due">Rent Due Reminder</option>
               <option value="lease_expiry">Lease Expiry Notice</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Title</label>
+            <label className="block font-semibold mb-1" style={{ color: "var(--text-secondary)" }}>Notice Title *</label>
             <input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 rounded-xl border outline-none focus:ring-2 focus:ring-slate-700"
               style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border)", color: "var(--text-primary)" }}
-              placeholder="Enter notice title..."
+              placeholder="e.g. Scheduled Elevator Maintenance Notice"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Message</label>
+            <label className="block font-semibold mb-1" style={{ color: "var(--text-secondary)" }}>Message Body *</label>
             <textarea
               value={form.message}
               onChange={(e) => setForm({ ...form, message: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border text-sm outline-none focus:ring-2 focus:ring-blue-500 min-h-[120px]"
+              className="w-full px-3 py-2 rounded-xl border outline-none focus:ring-2 focus:ring-slate-700 min-h-[110px]"
               style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border)", color: "var(--text-primary)" }}
-              placeholder="Enter your notice message..."
+              placeholder="Provide full details of the notice..."
             />
           </div>
 
           {sent && (
-            <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-sm flex items-center gap-2">
-              <CheckCircle size={16} /> Notice sent successfully!
+            <div className="p-3 rounded-xl badge-sage font-semibold flex items-center gap-2">
+              <CheckCircle2 size={15} /> Announcement dispatched to recipient(s)!
             </div>
           )}
 
           <button
             onClick={handleSend}
             disabled={sending || !form.title || !form.message || (!form.sendToAll && !form.userId)}
-            className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg text-sm font-medium cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {sending ? <Loader2 size={16} className="animate-spin-slow" /> : <Send size={16} />}
-            {sending ? "Sending..." : "Send Notice"}
+            {sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+            {sending ? "Transmitting Announcement..." : "Broadcast Notice"}
           </button>
         </div>
       </div>

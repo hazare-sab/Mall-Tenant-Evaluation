@@ -1,0 +1,8 @@
+node_modules/
+mall-tenant-management-system/node_modules/
+.next/
+mall-tenant-management-system/.next/
+*.log
+.env
+.env.local
+.DS_Store

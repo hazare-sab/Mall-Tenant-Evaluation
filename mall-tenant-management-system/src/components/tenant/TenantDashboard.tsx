@@ -69,9 +69,11 @@ export default function TenantDashboard({ user, onLogout, darkMode, toggleDarkMo
       >
         <div className="flex flex-col h-full">
           <div className="p-5 flex items-center gap-3 border-b border-white/10">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Building2 size={22} className="text-white" />
-            </div>
+            <img
+              src="/favicon.png"
+              alt="Logo"
+              className="w-10 h-10 rounded-xl object-cover border border-emerald-500/30 shadow-md"
+            />
             <div>
               <h2 className="font-bold text-white text-sm">Mall Tenant</h2>
               <p className="text-xs text-slate-400">Tenant Portal</p>

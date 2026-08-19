@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileText, Download, Loader2 } from "lucide-react";
+import { Download, Loader2, ArrowUpRight, CheckCircle2, Clock, AlertTriangle, Building, Calendar } from "lucide-react";
 import { api } from "@/lib/api";
 
 interface Payment {
@@ -37,6 +37,8 @@ interface Shop {
 }
 
 type ReportType = "rent_collection" | "pending" | "overdue" | "occupancy" | "lease_expiry";
+
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function ReportsPanel() {
   const [reportType, setReportType] = useState<ReportType>("rent_collection");
@@ -91,7 +93,6 @@ export default function ReportsPanel() {
       });
     } else {
       csv = "Tenant,Brand,Shop,Amount,Due Date,Payment Date,Status,Period\n";
-      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       payments.forEach((p) => {
         csv += `${p.tenantName},${p.brandName || ""},${p.shopNumber || ""},${p.amount},${p.dueDate},${p.paymentDate || ""},${p.status},${monthNames[p.month - 1]} ${p.year}\n`;
       });
@@ -105,81 +106,103 @@ export default function ReportsPanel() {
     URL.revokeObjectURL(url);
   };
 
-  const reports: { key: ReportType; label: string; desc: string }[] = [
-    { key: "rent_collection", label: "Rent Collection", desc: "All approved rent payments" },
-    { key: "pending", label: "Pending Payments", desc: "Payments awaiting approval" },
-    { key: "overdue", label: "Overdue Payments", desc: "Past due date and unpaid" },
-    { key: "occupancy", label: "Occupancy Report", desc: "Shop occupancy status" },
-    { key: "lease_expiry", label: "Lease Expiry", desc: "Leases expiring in 90 days" },
+  const reports: { key: ReportType; label: string; desc: string; icon: typeof CheckCircle2 }[] = [
+    { key: "rent_collection", label: "Rent Collection", desc: "Approved payments & revenue", icon: CheckCircle2 },
+    { key: "pending", label: "Pending Payments", desc: "Awaiting admin verification", icon: Clock },
+    { key: "overdue", label: "Overdue Payments", desc: "Unpaid past due date", icon: AlertTriangle },
+    { key: "occupancy", label: "Occupancy", desc: "Shop allocation & status", icon: Building },
+    { key: "lease_expiry", label: "Lease Expiry", desc: "Expiring within 90 days", icon: Calendar },
   ];
-
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        {reports.map((r) => (
-          <button
-            key={r.key}
-            onClick={() => setReportType(r.key)}
-            className={`p-4 rounded-xl border text-left transition cursor-pointer ${
-              reportType === r.key ? "ring-2 ring-blue-500 border-blue-500" : ""
-            }`}
-            style={{ backgroundColor: "var(--bg-secondary)", borderColor: reportType === r.key ? undefined : "var(--border)" }}
-          >
-            <FileText size={18} className={reportType === r.key ? "text-blue-500" : ""} style={{ color: reportType === r.key ? undefined : "var(--text-secondary)" }} />
-            <p className="font-medium text-sm mt-2" style={{ color: "var(--text-primary)" }}>{r.label}</p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--text-secondary)" }}>{r.desc}</p>
-          </button>
-        ))}
-      </div>
+      {/* Title & Actions Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+            Financial & Operational Reports
+          </h2>
+          <p className="text-xs mt-0.5" style={{ color: "var(--text-secondary)" }}>
+            Export comprehensive analytics, tenant audit trails, and revenue breakdowns
+          </p>
+        </div>
 
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-          {reports.find((r) => r.key === reportType)?.label}
-        </h3>
         <button
           onClick={downloadCSV}
-          className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg text-sm font-medium flex items-center gap-2 cursor-pointer shadow"
+          className="px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm hover:shadow-md"
         >
-          <Download size={16} /> Download CSV
+          <Download size={14} /> Download CSV
         </button>
       </div>
 
-      <div
-        className="rounded-xl border overflow-hidden shadow-sm"
-        style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}
-      >
+      {/* Segmented Control Tab Bar */}
+      <div className="p-1 rounded-2xl border flex flex-wrap sm:flex-nowrap gap-1" style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}>
+        {reports.map((r) => {
+          const Icon = r.icon;
+          const active = reportType === r.key;
+          return (
+            <button
+              key={r.key}
+              onClick={() => setReportType(r.key)}
+              className={`flex-1 min-w-[130px] py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                active
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm"
+                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+              }`}
+            >
+              <Icon size={14} className={active ? "text-emerald-400 dark:text-emerald-600" : "text-slate-400"} />
+              <span>{r.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Main Data Table Surface */}
+      <div className="warm-card overflow-hidden">
+        <div className="p-5 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+          <div>
+            <h3 className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>
+              {reports.find((r) => r.key === reportType)?.label} Data Log
+            </h3>
+            <p className="text-xs mt-0.5" style={{ color: "var(--text-secondary)" }}>
+              {reports.find((r) => r.key === reportType)?.desc}
+            </p>
+          </div>
+
+          <span className="text-xs font-medium px-2.5 py-1 rounded-lg border bg-slate-50 dark:bg-slate-800/60" style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}>
+            {reportType === "occupancy" ? `${shops.length} Shops` : reportType === "lease_expiry" ? `${tenants.length} Tenants` : `${payments.length} Records`}
+          </span>
+        </div>
+
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 size={24} className="animate-spin-slow" style={{ color: "var(--text-secondary)" }} />
+            <div className="flex items-center justify-center py-20">
+              <Loader2 size={24} className="animate-spin text-slate-400" />
             </div>
           ) : reportType === "occupancy" ? (
-            <table className="w-full text-sm">
+            <table className="w-full text-xs text-left">
               <thead>
-                <tr className="border-b" style={{ borderColor: "var(--border)" }}>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Shop #</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Floor</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Size</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Category</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Status</th>
+                <tr className="border-b bg-slate-50/60 dark:bg-slate-900/50" style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Shop Number</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Floor</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Shop Size</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Category</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Occupancy Status</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y" style={{ borderColor: "var(--border)" }}>
                 {shops.map((s) => (
-                  <tr key={s.id} className="border-b" style={{ borderColor: "var(--border)" }}>
-                    <td className="px-4 py-3 font-medium" style={{ color: "var(--text-primary)" }}>{s.shopNumber}</td>
-                    <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>Floor {s.floor}</td>
-                    <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>{s.shopSize || "-"}</td>
-                    <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>{s.category || "-"}</td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                        s.status === "occupied"
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                          : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                  <tr key={s.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="py-4 px-6 font-bold" style={{ color: "var(--text-primary)" }}>{s.shopNumber}</td>
+                    <td className="py-4 px-6" style={{ color: "var(--text-secondary)" }}>Floor {s.floor}</td>
+                    <td className="py-4 px-6 font-medium" style={{ color: "var(--text-primary)" }}>{s.shopSize || "-"}</td>
+                    <td className="py-4 px-6" style={{ color: "var(--text-secondary)" }}>{s.category || "-"}</td>
+                    <td className="py-4 px-6">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
+                        s.status === "occupied" ? "badge-sage" : "badge-amber"
                       }`}>
-                        {s.status}
+                        <span className={`w-1.5 h-1.5 rounded-full ${s.status === "occupied" ? "bg-emerald-600" : "bg-amber-600"}`} />
+                        {s.status.toUpperCase()}
                       </span>
                     </td>
                   </tr>
@@ -187,70 +210,85 @@ export default function ReportsPanel() {
               </tbody>
             </table>
           ) : reportType === "lease_expiry" ? (
-            <table className="w-full text-sm">
+            <table className="w-full text-xs text-left">
               <thead>
-                <tr className="border-b" style={{ borderColor: "var(--border)" }}>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Tenant</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Brand</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Shop</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Monthly Rent</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Lease End</th>
+                <tr className="border-b bg-slate-50/60 dark:bg-slate-900/50" style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Tenant Name</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Brand Name</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Shop #</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Monthly Rent</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Lease Expiration</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y" style={{ borderColor: "var(--border)" }}>
                 {tenants.length === 0 ? (
-                  <tr><td colSpan={5} className="text-center py-10" style={{ color: "var(--text-secondary)" }}>No expiring leases</td></tr>
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-slate-400 font-medium">
+                      No leases expiring within the next 90 days.
+                    </td>
+                  </tr>
                 ) : tenants.map((t) => (
-                  <tr key={t.id} className="border-b" style={{ borderColor: "var(--border)" }}>
-                    <td className="px-4 py-3 font-medium" style={{ color: "var(--text-primary)" }}>{t.userName}</td>
-                    <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>{t.brandName || "-"}</td>
-                    <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>{t.shopNumber || "-"}</td>
-                    <td className="px-4 py-3 font-medium" style={{ color: "var(--text-primary)" }}>
+                  <tr key={t.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="py-4 px-6 font-bold" style={{ color: "var(--text-primary)" }}>{t.userName}</td>
+                    <td className="py-4 px-6 font-medium" style={{ color: "var(--text-secondary)" }}>{t.brandName || "-"}</td>
+                    <td className="py-4 px-6" style={{ color: "var(--text-secondary)" }}>{t.shopNumber || "-"}</td>
+                    <td className="py-4 px-6 font-bold" style={{ color: "var(--text-primary)" }}>
                       {t.monthlyRent ? `₹${parseFloat(t.monthlyRent).toLocaleString()}` : "-"}
                     </td>
-                    <td className="px-4 py-3 text-red-500 font-medium">{t.leaseEndDate || "-"}</td>
+                    <td className="py-4 px-6">
+                      <span className="badge-red px-3 py-1 rounded-full font-semibold">
+                        {t.leaseEndDate || "-"}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
-            <table className="w-full text-sm">
+            <table className="w-full text-xs text-left">
               <thead>
-                <tr className="border-b" style={{ borderColor: "var(--border)" }}>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Tenant</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Shop</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Amount</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Due Date</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Period</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Status</th>
+                <tr className="border-b bg-slate-50/60 dark:bg-slate-900/50" style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Tenant / Brand</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Shop #</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Amount</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Due Date</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Billing Period</th>
+                  <th className="py-3.5 px-6 font-semibold uppercase tracking-wider">Payment Status</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y" style={{ borderColor: "var(--border)" }}>
                 {payments.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center py-10" style={{ color: "var(--text-secondary)" }}>No data</td></tr>
-                ) : payments.map((p) => (
-                  <tr key={p.id} className="border-b" style={{ borderColor: "var(--border)" }}>
-                    <td className="px-4 py-3">
-                      <p className="font-medium" style={{ color: "var(--text-primary)" }}>{p.tenantName}</p>
-                      <p className="text-xs" style={{ color: "var(--text-secondary)" }}>{p.brandName}</p>
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-slate-400 font-medium">
+                      No payment records found for this view.
                     </td>
-                    <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>{p.shopNumber || "-"}</td>
-                    <td className="px-4 py-3 font-medium" style={{ color: "var(--text-primary)" }}>
+                  </tr>
+                ) : payments.map((p) => (
+                  <tr key={p.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="py-4 px-6">
+                      <p className="font-bold" style={{ color: "var(--text-primary)" }}>{p.tenantName}</p>
+                      <p className="text-[11px] font-medium" style={{ color: "var(--text-secondary)" }}>{p.brandName || "Individual Tenant"}</p>
+                    </td>
+                    <td className="py-4 px-6 font-semibold" style={{ color: "var(--text-secondary)" }}>{p.shopNumber || "-"}</td>
+                    <td className="py-4 px-6 font-extrabold text-sm" style={{ color: "var(--text-primary)" }}>
                       ₹{parseFloat(p.amount).toLocaleString()}
                     </td>
-                    <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>{p.dueDate}</td>
-                    <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>
+                    <td className="py-4 px-6 font-medium" style={{ color: "var(--text-secondary)" }}>{p.dueDate}</td>
+                    <td className="py-4 px-6" style={{ color: "var(--text-secondary)" }}>
                       {monthNames[p.month - 1]} {p.year}
                     </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                    <td className="py-4 px-6">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
                         p.status === "approved"
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                          ? "badge-sage"
                           : p.status === "rejected"
-                          ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                          : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                          ? "badge-red"
+                          : "badge-amber"
                       }`}>
-                        {p.status}
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          p.status === "approved" ? "bg-emerald-600" : p.status === "rejected" ? "bg-red-600" : "bg-amber-600"
+                        }`} />
+                        {p.status.toUpperCase()}
                       </span>
                     </td>
                   </tr>

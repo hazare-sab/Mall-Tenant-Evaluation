@@ -1,70 +1,126 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --bg-primary: #f8fafc;
-    --bg-secondary: #ffffff;
-    --bg-sidebar: #0f172a;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-sidebar: #e2e8f0;
-    --border: #e2e8f0;
-    --accent: #3b82f6;
-    --accent-hover: #2563eb;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #ef4444;
-  }
-  .dark {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-sidebar: #020617;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-sidebar: #e2e8f0;
-    --border: #334155;
-    --accent: #3b82f6;
-    --accent-hover: #60a5fa;
-    --success: #34d399;
-    --warning: #fbbf24;
-    --danger: #f87171;
-  }
+:root {
+  --bg-primary: #F8F6F4;
+  --bg-secondary: #FFFFFF;
+  --bg-sidebar: #1E293B;
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --text-sidebar: #F1F5F9;
+  --text-sidebar-muted: #94A3B8;
+  --border: #E2E8F0;
+  --border-subtle: #F1F5F9;
+  --accent-sage: #4A6B5D;
+  --accent-sage-bg: #EBF2EE;
+  --accent-sage-text: #2C4339;
+  --accent-amber: #D97706;
+  --accent-amber-bg: #FEF3C7;
+  --accent-amber-text: #92400E;
+  --accent-red: #DC2626;
+  --accent-red-bg: #FEE2E2;
+  --accent-red-text: #991B1B;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.dark {
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-sidebar: #020617;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-sidebar: #F8FAFC;
+  --text-sidebar-muted: #64748B;
+  --border: #334155;
+  --border-subtle: #1E293B;
+  --accent-sage: #6B8F7E;
+  --accent-sage-bg: rgba(74, 107, 93, 0.2);
+  --accent-sage-text: #A7C4B5;
+  --accent-amber: #F59E0B;
+  --accent-amber-bg: rgba(217, 119, 6, 0.2);
+  --accent-amber-text: #FDE68A;
+  --accent-red: #F87171;
+  --accent-red-bg: rgba(220, 38, 38, 0.2);
+  --accent-red-text: #FECACA;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #94a3b8 transparent;
+  scrollbar-color: #CBD5E1 transparent;
 }
 
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  transition: background-color 0.3s, color 0.3s;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slideIn {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
+/* Warm Minimalist Design Card Utility */
+.warm-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
-.animate-slide-in {
-  animation: slideIn 0.3s ease-out;
+.warm-card-hover:hover {
+  box-shadow: var(--shadow-md);
+  border-color: #CBD5E1;
 }
 
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Status Badges */
+.badge-sage {
+  background-color: var(--accent-sage-bg);
+  color: var(--accent-sage-text);
+  border: 1px solid rgba(74, 107, 93, 0.2);
 }
 
-.animate-spin-slow {
-  animation: spin-slow 1s linear infinite;
+.badge-amber {
+  background-color: var(--accent-amber-bg);
+  color: var(--accent-amber-text);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+.badge-red {
+  background-color: var(--accent-red-bg);
+  color: var(--accent-red-text);
+  border: 1px solid rgba(220, 38, 38, 0.2);
 }

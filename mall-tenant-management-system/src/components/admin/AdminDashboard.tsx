@@ -2,9 +2,20 @@
 
 import { useState, useEffect } from "react";
 import {
-  LayoutDashboard, Store, Users, CreditCard, Bell, FileText,
-  LogOut, Menu, X, Sun, Moon, Building2, ChevronDown, Search,
-  Send
+  LayoutDashboard,
+  Store,
+  Users,
+  CreditCard,
+  Bell,
+  FileText,
+  LogOut,
+  Menu,
+  X,
+  Sun,
+  Moon,
+  Search,
+  Send,
+  Building2,
 } from "lucide-react";
 import DashboardOverview from "./DashboardOverview";
 import ShopsManager from "./ShopsManager";
@@ -29,15 +40,15 @@ interface Props {
   toggleDarkMode: () => void;
 }
 
-type Page = "dashboard" | "shops" | "tenants" | "payments" | "notifications" | "reports" | "notices";
+type Page = "dashboard" | "shops" | "tenants" | "payments" | "notices" | "reports" | "notifications";
 
 const navItems: { key: Page; label: string; icon: typeof LayoutDashboard }[] = [
-  { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { key: "dashboard", label: "Overview", icon: LayoutDashboard },
   { key: "shops", label: "Shops", icon: Store },
   { key: "tenants", label: "Tenants", icon: Users },
   { key: "payments", label: "Payments", icon: CreditCard },
-  { key: "notices", label: "Notices", icon: Send },
   { key: "reports", label: "Reports", icon: FileText },
+  { key: "notices", label: "Notices", icon: Send },
   { key: "notifications", label: "Notifications", icon: Bell },
 ];
 
@@ -65,37 +76,41 @@ export default function AdminDashboard({ user, onLogout, darkMode, toggleDarkMod
       case "shops": return <ShopsManager />;
       case "tenants": return <TenantsManager />;
       case "payments": return <PaymentsManager />;
-      case "notifications": return <NotificationsPanel onRead={() => setUnreadCount((c) => Math.max(0, c - 1))} />;
       case "reports": return <ReportsPanel />;
       case "notices": return <NoticesPanel />;
+      case "notifications": return <NotificationsPanel onRead={() => setUnreadCount((c) => Math.max(0, c - 1))} />;
       default: return <DashboardOverview />;
     }
   };
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "var(--bg-primary)" }}>
-      {/* Sidebar */}
+      {/* Refined Modern Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 lg:relative lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-200 lg:relative lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{ backgroundColor: "var(--bg-sidebar)" }}
       >
         <div className="flex flex-col h-full">
-          <div className="p-5 flex items-center gap-3 border-b border-white/10">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Building2 size={22} className="text-white" />
-            </div>
+          {/* Header */}
+          <div className="p-5 flex items-center gap-3 border-b border-slate-800">
+            <img
+              src="/favicon.png"
+              alt="Logo"
+              className="w-9 h-9 rounded-xl object-cover border border-slate-700/60 shadow-md"
+            />
             <div>
-              <h2 className="font-bold text-white text-sm">Mall Management</h2>
-              <p className="text-xs text-slate-400">Admin Panel</p>
+              <h2 className="font-bold text-white text-sm tracking-tight">Mall Tenant Admin</h2>
+              <p className="text-[11px] text-slate-400 font-medium">Evaluation & Operations</p>
             </div>
-            <button onClick={() => setSidebarOpen(false)} className="lg:hidden ml-auto text-slate-400 cursor-pointer">
-              <X size={20} />
+            <button onClick={() => setSidebarOpen(false)} className="lg:hidden ml-auto text-slate-400 hover:text-white cursor-pointer">
+              <X size={18} />
             </button>
           </div>
 
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {/* Navigation Links */}
+          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = page === item.key;
@@ -103,16 +118,16 @@ export default function AdminDashboard({ user, onLogout, darkMode, toggleDarkMod
                 <button
                   key={item.key}
                   onClick={() => { setPage(item.key); setSidebarOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer relative ${
                     active
-                      ? "bg-blue-600 text-white shadow-lg"
-                      : "text-slate-300 hover:bg-white/10 hover:text-white"
+                      ? "bg-slate-800/90 text-white shadow-sm border-l-2 border-emerald-400 pl-3.5"
+                      : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200"
                   }`}
                 >
-                  <Icon size={18} />
+                  <Icon size={17} className={active ? "text-emerald-400" : "text-slate-400"} />
                   {item.label}
                   {item.key === "notifications" && unreadCount > 0 && (
-                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                    <span className="ml-auto bg-amber-500 text-slate-950 font-bold text-[10px] px-1.5 py-0.5 rounded-full">
                       {unreadCount}
                     </span>
                   )}
@@ -121,29 +136,31 @@ export default function AdminDashboard({ user, onLogout, darkMode, toggleDarkMod
             })}
           </nav>
 
-          <div className="p-4 border-t border-white/10">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+          {/* Compact User Profile Footer */}
+          <div className="p-3.5 border-t border-slate-800 bg-slate-950/40">
+            <div className="flex items-center gap-2.5 mb-2.5">
+              <div className="w-8 h-8 rounded-full bg-slate-800 text-slate-200 font-bold text-xs flex items-center justify-center border border-slate-700">
                 {user.name.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                <p className="text-xs font-semibold text-slate-100 truncate">{user.name}</p>
+                <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
               </div>
             </div>
-            <div className="flex gap-2">
+
+            <div className="flex gap-1.5">
               <button
                 onClick={toggleDarkMode}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs text-slate-300 hover:bg-white/10 transition cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[11px] font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition cursor-pointer"
               >
-                {darkMode ? <Sun size={14} /> : <Moon size={14} />}
+                {darkMode ? <Sun size={13} /> : <Moon size={13} />}
                 {darkMode ? "Light" : "Dark"}
               </button>
               <button
                 onClick={onLogout}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-500/10 transition cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[11px] font-medium text-red-400 hover:bg-red-950/40 transition cursor-pointer"
               >
-                <LogOut size={14} />
+                <LogOut size={13} />
                 Logout
               </button>
             </div>
@@ -153,28 +170,64 @@ export default function AdminDashboard({ user, onLogout, darkMode, toggleDarkMod
 
       {/* Overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-slate-950/60 z-40 lg:hidden backdrop-blur-xs" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Main */}
-      <main className="flex-1 overflow-y-auto">
+      {/* Main Container */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Header */}
         <header
-          className="sticky top-0 z-30 flex items-center gap-4 px-4 lg:px-8 py-4 border-b"
+          className="sticky top-0 z-30 flex items-center justify-between px-6 py-3.5 border-b"
           style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}
         >
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer"
-            style={{ color: "var(--text-primary)" }}
-          >
-            <Menu size={22} />
-          </button>
-          <h1 className="text-lg lg:text-xl font-bold capitalize" style={{ color: "var(--text-primary)" }}>
-            {page === "dashboard" ? "Dashboard" : navItems.find((n) => n.key === page)?.label}
-          </h1>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-1.5 rounded-lg border hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <Menu size={18} />
+            </button>
+            <div>
+              <h1 className="text-base font-bold tracking-tight capitalize" style={{ color: "var(--text-primary)" }}>
+                {page === "dashboard" ? "Dashboard Overview" : navItems.find((n) => n.key === page)?.label}
+              </h1>
+              <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                {page === "dashboard" && "Real-time key metrics and operational analytics"}
+                {page === "shops" && "Manage shop directory, dimensions, and occupancy status"}
+                {page === "tenants" && "Tenant records, lease terms, and contact details"}
+                {page === "payments" && "Rent collection, pending approvals, and payment logs"}
+                {page === "reports" && "Financial reporting, collections, and lease expirations"}
+                {page === "notices" && "Broadcast announcements and official notices to tenants"}
+                {page === "notifications" && "System notifications and status alerts"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Quick Search Bar */}
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs w-56" style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border)", color: "var(--text-secondary)" }}>
+              <Search size={14} className="text-slate-400" />
+              <span>Search tenants, shops...</span>
+              <kbd className="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded border bg-slate-200/50 dark:bg-slate-800 dark:border-slate-700">⌘K</kbd>
+            </div>
+
+            {/* Notification Icon Button */}
+            <button
+              onClick={() => setPage("notifications")}
+              className="p-2 rounded-lg border relative transition hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)", color: "var(--text-primary)" }}
+            >
+              <Bell size={16} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-500 rounded-full ring-2 ring-white dark:ring-slate-900" />
+              )}
+            </button>
+          </div>
         </header>
 
-        <div className="p-4 lg:p-8 animate-fade-in">
+        {/* Page Content */}
+        <div className="flex-1 overflow-y-auto p-6 lg:p-8 animate-fade-in">
           {renderPage()}
         </div>
       </main>
