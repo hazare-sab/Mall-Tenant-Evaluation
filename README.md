@@ -57,7 +57,7 @@ Mall-Tenant-Evaluation/
    git clone <your-repository-url>
    ```
 
-2. Navigate to the project directory:
+2. Navigate to  project directory:
 
    ```bash
    cd Mall-Tenant-Evaluation
